@@ -1,58 +1,18 @@
-const express = require("express");
-const WebSocket = require("ws");
-
-const app = express();
-const server = require("http").createServer(app);
-
-const wss = new WebSocket.Server({ server });
+const io = require("socket.io")(3000, {
+  cors: {
+    origin: "*",
+  },
+});
 
 let pcInfo = {};
 
-app.get("/api/create", () => {});
-
-wss.on("connection", (ws) => {
-  ws.send("New User Connected");
-  ws.on("message", (message) => {
-    dataObject = JSON.parse(message);
-
-    switch (dataObject.type) {
-      case "create":
-        pcInfo[dataObject.username] = {
-          socketId: dataObject.socketId,
-          password: dataObject.password,
-        };
-        break;
-
-      case "connect":
-        if (
-          pcInfo[dataObject.username] &&
-          pcInfo[dataObject.username].password == dataObject.password
-        ) {
-          ws.send("connected");
-        }
-        break;
-
-      case "perform":
-        if (
-          pcInfo[dataObject.username] &&
-          pcInfo[dataObject.username].password == dataObject.password
-        ) {
-          ws.send(dataObject.function);
-        }
-        break;
-
-      case "disconnect":
-        if (
-          pcInfo[dataObject.username] &&
-          pcInfo[dataObject.username].password == dataObject.password
-        ) {
-          delete pcInfo[dataObject.username];
-        }
+io.on("connection", (socket) => {
+  console.log(socket.id);
+  socket.on("create", (data) => {
+    console.log(data);
+    if (!pcInfo[data.username]) {
+      socket.emit("created", data);
+      pcInfo[data.username] = { password: data.password, id: socket.id };
     }
-    ws.send(`Hello, you sent -> ${message}`);
   });
-});
-
-server.listen(5000, () => {
-  console.log("Listening to port 5000");
 });
