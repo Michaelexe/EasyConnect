@@ -3,18 +3,26 @@ import tkinter.font as tkfont
 from PIL import Image, ImageTk
 import socketio
 
+from methods import music
+
 root = tk.Tk()
 root.title("EasyConnect")
 root.geometry("800x450")
 
 sio = socketio.Client()
-sio.connect('http://localhost:3000')
+# url = 'http://localhost:3000'
+url = 'https://eas-tf48.onrender.com'
+sio.connect(url)
 
 @sio.on('created')
 def CreatedHandler(data):
     loginFrame.destroy()
     usernameValue.config(text=data["username"])
     passwordValue.config(text=data["password"])
+
+@sio.on('youtube')
+def onYoutube(data):
+    music.play_song(data['search'])
 
 def createHandler(userEntry, passwordEntry):
     sio.emit("create", {
