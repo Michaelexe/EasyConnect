@@ -12,7 +12,12 @@ io.on("connection", (socket) => {
     console.log(data);
     if (!pcInfo[data.username]) {
       socket.emit("created", data);
-      pcInfo[data.username] = { password: data.password, id: socket.id };
+      pcInfo[data.username] = {
+        password: data.password,
+        id: socket.id,
+        brightness: data.brightness,
+        volume: data.volume,
+      };
       console.log(socket.id);
     }
   });
@@ -23,7 +28,11 @@ io.on("connection", (socket) => {
       pcInfo[data.username] &&
       pcInfo[data.username].password == data.password
     ) {
-      socket.emit("connected", data);
+      socket.emit("connected", {
+        ...data,
+        brightness: pcInfo[data.username].brightness,
+        volume: pcInfo[data.username].volume,
+      });
     }
   });
 

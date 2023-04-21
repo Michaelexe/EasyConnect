@@ -4,6 +4,8 @@ from PIL import Image, ImageTk
 import socketio
 
 from methods import music
+from methods import brightness
+from methods import volume
 
 root = tk.Tk()
 root.title("EasyConnect")
@@ -24,10 +26,20 @@ def CreatedHandler(data):
 def onYoutube(data):
     music.play_song(data['search'])
 
+@sio.on('volume')
+def onVolume(data):
+    volume.set_volume(data['volume'])
+
+@sio.on('brightness')
+def onBrightness(data):
+    brightness.set_brightness(data['brightness'])
+
 def createHandler(userEntry, passwordEntry):
     sio.emit("create", {
         "username": userEntry.get(),
-        "password": passwordEntry.get()
+        "password": passwordEntry.get(),
+        "volume": volume.get_volume(),
+        "brightness": brightness.get_brightness()[0],
     })
 
 def exitHandler(root, socket):
