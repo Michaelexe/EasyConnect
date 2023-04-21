@@ -11,6 +11,8 @@ root = tk.Tk()
 root.title("EasyConnect")
 root.geometry("800x450")
 
+user = {}
+
 sio = socketio.Client()
 # url = 'http://localhost:3000'
 url = 'https://eas-tf48.onrender.com'
@@ -18,9 +20,11 @@ sio.connect(url)
 
 @sio.on('created')
 def CreatedHandler(data):
-    loginFrame.destroy()
+    connectedFrame.tkraise()
     usernameValue.config(text=data["username"])
     passwordValue.config(text=data["password"])
+    user["username"] = data["username"]
+    user["password"] = data["password"]
 
 @sio.on('youtube')
 def onYoutube(data):
@@ -45,6 +49,14 @@ def createHandler(userEntry, passwordEntry):
 def exitHandler(root, socket):
     socket.disconnect()
     root.destroy()
+
+def disconnectHandler(user):
+    sio.emit("disconnect-pc", {
+        "password": user["password"],
+        "username": user["username"],
+    })
+    loginFrame.tkraise()
+    user = {}
 
 
 labelFont = tkfont.Font(size=16)
@@ -75,6 +87,9 @@ connectedPasswordLabel = tk.Label(connectedInputFrame,text="Password: ", bg="#33
 connectedPasswordLabel.grid(row=1, column=0, pady=5)
 passwordValue = tk.Label(connectedInputFrame, bg="#333333", fg="white", font=labelFont)
 passwordValue.grid(row = 1, column = 1, pady = 10, ipady=5)
+
+disconnectButton = tk.Button(connectedInputFrame, text = "Disconnect", bg = "Grey", fg = "Black", width=15, font=labelFont, command=lambda: disconnectHandler(user))
+disconnectButton.grid(row=2, columnspan=2, pady=10)
 
 #login scene
 loginFrame = tk.Frame(root, bg="#333333")

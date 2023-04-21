@@ -11,9 +11,14 @@ const App = () => {
 
   useEffect(() => {
     socket.connect();
+
     socket.on('connected', user => {
       console.log(user);
       setUser(user);
+    });
+
+    socket.on('disconnect-phone', () => {
+      setUser();
     });
 
     return () => {

@@ -8,6 +8,7 @@ let pcInfo = {};
 
 io.on("connection", (socket) => {
   console.log(socket.id);
+
   socket.on("create", (data) => {
     console.log(data);
     if (!pcInfo[data.username]) {
@@ -33,6 +34,7 @@ io.on("connection", (socket) => {
         brightness: pcInfo[data.username].brightness,
         volume: pcInfo[data.username].volume,
       });
+      pcInfo[data.username].phoneId = socket.id;
     }
   });
 
@@ -42,6 +44,17 @@ io.on("connection", (socket) => {
       pcInfo[data.username].password == data.password
     ) {
       socket.to(pcInfo[data.username].id).emit(data.type, data.data);
+    }
+  });
+
+  socket.on("disconnect-pc", (data) => {
+    console.log(data);
+    if (
+      pcInfo[data.username] &&
+      pcInfo[data.username].password == data.password
+    ) {
+      socket.to(pcInfo[data.username].phoneId).emit("disconnect-phone");
+      delete pcInfo[data.username];
     }
   });
 });
