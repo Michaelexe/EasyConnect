@@ -6,6 +6,7 @@ import socketio
 from methods import music
 from methods import brightness
 from methods import volume
+from methods import spotify
 
 root = tk.Tk()
 root.title("EasyConnect")
@@ -30,6 +31,10 @@ def CreatedHandler(data):
 def onYoutube(data):
     music.play_song(data['search'])
 
+@sio.on('spotify')
+def onSpotify(data):
+    spotify.play_song()
+
 @sio.on('volume')
 def onVolume(data):
     volume.set_volume(data['volume'])
@@ -46,8 +51,9 @@ def createHandler(userEntry, passwordEntry):
         "brightness": brightness.get_brightness()[0],
     })
 
-def exitHandler(root, socket):
-    socket.disconnect()
+def exitHandler(root, user):
+    disconnectHandler(user)
+    sio.disconnect()
     root.destroy()
 
 def disconnectHandler(user):
@@ -119,5 +125,5 @@ loginButton.grid(row=2, columnspan=2, pady=10)
 
 
 
-root.protocol("WM_DELETE_WINDOW", lambda: exitHandler(root, sio))
+root.protocol("WM_DELETE_WINDOW", lambda: exitHandler(root, user))
 root.mainloop()

@@ -1,10 +1,19 @@
-import {View, Text, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Image,
+} from 'react-native';
 import React, {useContext, useState} from 'react';
 import Tiles from './Tiles';
 import YoutubeMacro from './YoutubeMacro';
 import {userContext} from '../context';
 import BrightnessSlider from './BrightnessSlider';
 import VolumeSlider from './VolumeSlider';
+import {socket} from '../socket';
+import spotifyPNG from '../assets/spotify.png';
 
 const MacrosScreen = () => {
   const {user} = useContext(userContext);
@@ -24,7 +33,6 @@ const MacrosScreen = () => {
             }}>
             <View
               style={{
-                width: '50%',
                 rowGap: 7,
                 flex: 2,
                 aspectRatio: 1,
@@ -54,6 +62,26 @@ const MacrosScreen = () => {
               setBrightness={setBrightness}
             />
             <VolumeSlider volume={volume} setVolume={setVolume} />
+          </View>
+          <View style={{flexDirection: 'row', columnGap: 7}}>
+            <Tiles
+              sizeStyles={{aspectRatio: '1', flex: 1}}
+              onClick={() => {
+                socket.emit('command', {
+                  type: 'spotify',
+                  data: {},
+                  ...user,
+                });
+              }}>
+              <Image
+                source={spotifyPNG}
+                style={{width: '60%', aspectRatio: 1, height: undefined}}
+              />
+              <Text style={{fontSize: 20, fontWeight: '800'}}>
+                Play Spotify
+              </Text>
+            </Tiles>
+            <Tiles sizeStyles={{aspectRatio: '1', flex: 1}} />
           </View>
         </ScrollView>
       </View>
