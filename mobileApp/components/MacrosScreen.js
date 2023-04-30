@@ -14,6 +14,7 @@ import BrightnessSlider from './BrightnessSlider';
 import VolumeSlider from './VolumeSlider';
 import {socket} from '../socket';
 import spotifyPNG from '../assets/spotify.png';
+import vscodePNG from '../assets/vscode.png';
 
 const MacrosScreen = () => {
   const {user} = useContext(userContext);
@@ -50,7 +51,20 @@ const MacrosScreen = () => {
                   flexDirection: 'row',
                   columnGap: 7,
                 }}>
-                <Tiles sizeStyles={{aspectRatio: '1', flex: 1}} />
+                <Tiles
+                  sizeStyles={{aspectRatio: '1', flex: 1}}
+                  onClick={() => {
+                    socket.emit('command', {
+                      type: 'vscode',
+                      data: {},
+                      ...user,
+                    });
+                  }}>
+                  <Image
+                    source={vscodePNG}
+                    style={{width: '80%', aspectRatio: 1, height: undefined}}
+                  />
+                </Tiles>
                 <Tiles sizeStyles={{aspectRatio: '1', flex: 1}} />
               </View>
             </View>

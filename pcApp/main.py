@@ -7,6 +7,7 @@ from methods import music
 from methods import brightness
 from methods import volume
 from methods import spotify
+from methods import VSCode
 
 root = tk.Tk()
 root.title("EasyConnect")
@@ -35,6 +36,10 @@ def onYoutube(data):
 def onSpotify(data):
     spotify.play_song()
 
+@sio.on('vscode')
+def onVSCode(data):
+    VSCode.open()
+
 @sio.on('volume')
 def onVolume(data):
     volume.set_volume(data['volume'])
@@ -52,7 +57,9 @@ def createHandler(userEntry, passwordEntry):
     })
 
 def exitHandler(root, user):
-    disconnectHandler(user)
+    if bool(user):
+        disconnectHandler(user)
+    
     sio.disconnect()
     root.destroy()
 
